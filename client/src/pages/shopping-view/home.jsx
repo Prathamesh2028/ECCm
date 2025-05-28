@@ -125,6 +125,11 @@ function ShoppingHome() {
      {featureImageList && featureImageList.length > 0
   ? featureImageList.map((slide, index) => (
       <img
+         style={{
+        width: '100%',
+        height: 'auto',
+        display: 'block'
+      }}
         src={slide} // ✅ Directly reference the image path
         key={index}
         className={`${
