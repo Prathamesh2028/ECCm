@@ -93,7 +93,7 @@ const shoppingCartSlice = createSlice({
       })
       .addCase(updateCartQuantity.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.cartItems = action.payload.data;
+        state.cartItems = action.payload.data.items;
       })
       .addCase(updateCartQuantity.rejected, (state) => {
         state.isLoading = false;
