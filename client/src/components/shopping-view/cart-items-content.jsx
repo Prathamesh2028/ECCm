@@ -13,50 +13,58 @@ function UserCartItemsContent({ cartItem }) {
   const dispatch = useDispatch();
 //   const { toast } = useToast();
 
-  function handleUpdateQuantity(getCartItem, typeOfAction) {
-    if (typeOfAction == "plus") {
-      let getCartItems = cartItems.items || [];
+function handleUpdateQuantity(getCartItem, typeOfAction) {
+    let getCartItems = cartItems.items || [];
 
-      if (getCartItems.length) {
+    if (getCartItems.length) {
         const indexOfCurrentCartItem = getCartItems.findIndex(
-          (item) => item.productId === getCartItem?.productId
+            (item) => item.productId === getCartItem?.productId
         );
 
         const getCurrentProductIndex = productList.findIndex(
-          (product) => product._id === getCartItem?.productId
+            (product) => product._id === getCartItem?.productId
         );
+
+        if (getCurrentProductIndex === -1) {
+            toast.error("Product not found in inventory");
+            return;
+        }
+
         const getTotalStock = productList[getCurrentProductIndex].totalStock;
 
         console.log(getCurrentProductIndex, getTotalStock, "getTotalStock");
 
         if (indexOfCurrentCartItem > -1) {
-          const getQuantity = getCartItems[indexOfCurrentCartItem].quantity;
-          if (getQuantity + 1 > getTotalStock) {
-           toast.error(`Only ${getQuantity} quantity can be added for this item`);
+            const getQuantity = getCartItems[indexOfCurrentCartItem].quantity;
 
+            if (typeOfAction === "plus" && getQuantity + 1 > getTotalStock) {
+                toast.error(`Only ${getTotalStock} quantity can be added for this item`);
+                return;
+            }
 
-            return;
-          }
+            if (typeOfAction === "minus" && getCartItem.quantity <= 1) {
+                toast.error("You cannot reduce the quantity below 1");
+                return;
+            }
         }
-      }
     }
 
     dispatch(
-      updateCartQuantity({
-        userId: user?.id,
-        productId: getCartItem?.productId,
-        quantity:
-          typeOfAction === "plus"
-            ? getCartItem?.quantity + 1
-            : getCartItem?.quantity - 1,
-      })
+        updateCartQuantity({
+            userId: user?.id,
+            productId: getCartItem?.productId,
+            quantity:
+                typeOfAction === "plus"
+                    ? getCartItem?.quantity + 1
+                    : getCartItem?.quantity - 1,
+        })
     ).then((data) => {
-      if (data?.payload?.success) {
-       
-        toast.success("Cart item is updated successfully");
-      }
+        if (data?.payload?.success) {
+            toast.success("Cart item updated successfully");
+        }
     });
-  }
+}
+
 
   function handleCartItemDelete(getCartItem) {
     dispatch(
